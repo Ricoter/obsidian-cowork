@@ -909,6 +909,11 @@ export const DEFAULT_SETTINGS: CopilotSettings = {
   githubCopilotAccessToken: "",
   githubCopilotToken: "",
   githubCopilotTokenExpiresAt: 0,
+  // [Cowork fork] Claude subscription OAuth
+  claudeOAuthEnabled: false,
+  claudeOAuthToken: "",
+  // [Cowork fork] Brevilabs disabled by default (no phone-home, no Plus features)
+  disableBrevilabs: true,
   defaultChainType: ChainType.LLM_CHAIN,
   defaultModelKey: ChatModels.OPENROUTER_GEMINI_2_5_FLASH + "|" + ChatModelProviders.OPENROUTERAI,
   embeddingModelKey:

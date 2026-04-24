@@ -70,6 +70,11 @@ export interface CopilotSettings {
   githubCopilotAccessToken: string;
   githubCopilotToken: string;
   githubCopilotTokenExpiresAt: number;
+  // [Cowork fork] Claude subscription OAuth — set via `claude setup-token` on desktop
+  claudeOAuthEnabled: boolean;
+  claudeOAuthToken: string;
+  // [Cowork fork] Disable Brevilabs (api.brevilabs.com) phone-home / Plus features
+  disableBrevilabs: boolean;
   defaultChainType: ChainType;
   defaultModelKey: string;
   embeddingModelKey: string;

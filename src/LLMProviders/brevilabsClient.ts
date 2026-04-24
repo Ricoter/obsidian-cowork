@@ -103,6 +103,11 @@ export class BrevilabsClient {
     excludeAuthHeader = false,
     skipLicenseCheck = false
   ): Promise<{ data: T | null; error?: Error }> {
+    // [Cowork fork] Short-circuit all Brevilabs requests when disabled (default).
+    // No network traffic to api.brevilabs.com is generated.
+    if (getSettings().disableBrevilabs) {
+      return { data: null, error: new Error("Brevilabs disabled in Cowork fork") };
+    }
     if (!skipLicenseCheck) {
       this.checkLicenseKey();
     }
@@ -149,6 +154,10 @@ export class BrevilabsClient {
     formData: FormData,
     skipLicenseCheck = false
   ): Promise<{ data: T | null; error?: Error }> {
+    // [Cowork fork] Short-circuit when Brevilabs disabled (default).
+    if (getSettings().disableBrevilabs) {
+      return { data: null, error: new Error("Brevilabs disabled in Cowork fork") };
+    }
     if (!skipLicenseCheck) {
       this.checkLicenseKey();
     }
@@ -196,6 +205,12 @@ export class BrevilabsClient {
   async validateLicenseKey(
     context?: Record<string, any>
   ): Promise<{ isValid: boolean | undefined; plan?: string }> {
+    // [Cowork fork] When Brevilabs is disabled, short-circuit license validation
+    // without any network request. Plus features remain off.
+    if (getSettings().disableBrevilabs) {
+      turnOffPlus();
+      return { isValid: false };
+    }
     // Build the request body with proper structure
     const requestBody: Record<string, any> = {
       license_key: await getDecryptedKey(getSettings().plusLicenseKey),
