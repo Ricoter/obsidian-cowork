@@ -1,7 +1,7 @@
 {
-  "name": "obsidian-copilot",
-  "version": "3.2.7",
-  "description": "Your AI Copilot: Chat with Your Second Brain, Learn Faster, Work Smarter.",
+  "name": "obsidian-cowork",
+  "version": "0.1.0",
+  "description": "Privacy-focused fork of Copilot for Obsidian with Claude subscription OAuth support and hardened mobile encryption.",
   "main": "main.js",
   "scripts": {
     "dev": "npm-run-all --parallel dev:*",
@@ -21,7 +21,7 @@
     "prompt:debug": "node scripts/printPromptDebug.js"
   },
   "keywords": [],
-  "author": "Logan Yang",
+  "author": "Ricoter (fork of Logan Yang's Copilot)",
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,css,md}": [
       "prettier --write"
