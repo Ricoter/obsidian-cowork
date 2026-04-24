@@ -15,6 +15,20 @@ const mockElectron = {
 
 jest.mock("electron", () => mockElectron);
 
+// [Cowork fork] Mobile encryption uses IndexedDB + non-extractable WebCrypto key.
+// Jest's jsdom env doesn't provide persistent IndexedDB reliably, so we stub the
+// module with an in-memory encryptor that round-trips through a reversible
+// "_idbencrypted" marker — matches the real enc_idb_ prefix contract.
+jest.mock("@/utils/mobileEncryption", () => ({
+  encryptMobile: jest.fn(async (plaintext: string) =>
+    Buffer.from(`${plaintext}_idbencrypted`).toString("base64")
+  ),
+  decryptMobile: jest.fn(async (encoded: string) =>
+    Buffer.from(encoded, "base64").toString().replace("_idbencrypted", "")
+  ),
+  getMobileKey: jest.fn(),
+}));
+
 global.TextEncoder = TextEncoder as any;
 global.TextDecoder = TextDecoder as any;
 
@@ -74,7 +88,7 @@ describe("EncryptionService", () => {
       const apiKey = "testApiKey";
       const encryptedKey = await getEncryptedKey(apiKey);
       // The key is base64 encoded, so we should expect that format
-      expect(encryptedKey).toMatch(/^enc_(desk|web)_[A-Za-z0-9+/=]+$/);
+      expect(encryptedKey).toMatch(/^enc_(desk|idb)_[A-Za-z0-9+/=]+$/);
       // Verify we can decrypt it back
       const decryptedKey = await getDecryptedKey(encryptedKey);
       expect(decryptedKey).toBe(apiKey);
@@ -112,8 +126,8 @@ describe("EncryptionService", () => {
       } as unknown as CopilotSettings;
 
       const newSettings = await encryptAllKeys(settings);
-      expect(newSettings.openAIApiKey).toMatch(/^enc_(desk|web)_[A-Za-z0-9+/=]+$/);
-      expect(newSettings.cohereApiKey).toMatch(/^enc_(desk|web)_[A-Za-z0-9+/=]+$/);
+      expect(newSettings.openAIApiKey).toMatch(/^enc_(desk|idb)_[A-Za-z0-9+/=]+$/);
+      expect(newSettings.cohereApiKey).toMatch(/^enc_(desk|idb)_[A-Za-z0-9+/=]+$/);
       expect(newSettings.userSystemPrompt).toBe("shouldBeIgnored");
 
       // Verify we can decrypt the keys back
@@ -159,7 +173,7 @@ describe("Cross-platform compatibility", () => {
 
     const originalKey = "testApiKey";
     const encryptedKey = await getEncryptedKey(originalKey);
-    expect(encryptedKey).toMatch(/^enc_(desk|web)_[A-Za-z0-9+/=]+$/);
+    expect(encryptedKey).toMatch(/^enc_(desk|idb)_[A-Za-z0-9+/=]+$/);
 
     // Reset the mock counts before decryption
     mockSubtle.encrypt.mockClear();
@@ -168,8 +182,10 @@ describe("Cross-platform compatibility", () => {
     const decryptedKey = await getDecryptedKey(encryptedKey);
     expect(decryptedKey).toBe(originalKey);
 
-    // On mobile, we should use Web Crypto API for decryption
-    expect(mockSubtle.decrypt).toHaveBeenCalled();
+    // On mobile in the Cowork fork, decryption goes through the IndexedDB
+    // module (mocked above), not through raw crypto.subtle.decrypt.
+    const { decryptMobile } = jest.requireMock("@/utils/mobileEncryption");
+    expect(decryptMobile).toHaveBeenCalled();
   });
 
   it("should be able to decrypt mobile-encrypted keys on desktop", async () => {
@@ -178,8 +194,9 @@ describe("Cross-platform compatibility", () => {
 
     const originalKey = "testApiKey";
     const mobileEncryptedKey = await getEncryptedKey(originalKey);
-    expect(mobileEncryptedKey).toMatch(/^enc_(desk|web)_[A-Za-z0-9+/=]+$/);
-    expect(mockSubtle.encrypt).toHaveBeenCalled();
+    expect(mobileEncryptedKey).toMatch(/^enc_(desk|idb)_[A-Za-z0-9+/=]+$/);
+    const { encryptMobile } = jest.requireMock("@/utils/mobileEncryption");
+    expect(encryptMobile).toHaveBeenCalled();
 
     // Reset the mock counts before desktop decryption
     mockSubtle.encrypt.mockClear();
