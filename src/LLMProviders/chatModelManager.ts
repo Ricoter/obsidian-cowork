@@ -42,6 +42,7 @@ import { ChatOpenRouter } from "./ChatOpenRouter";
 import { ChatLMStudio } from "./ChatLMStudio";
 import { BedrockChatModel, type BedrockChatModelFields } from "./BedrockChatModel";
 import { GitHubCopilotChatModel } from "@/LLMProviders/githubCopilot/GitHubCopilotChatModel";
+import { createClaudeOAuthFetch } from "@/LLMProviders/claudeOAuthFetch";
 
 // Patch BaseLanguageModel.prototype.getNumTokens once at module load to prevent
 // tiktoken CDN fetches. LangChain's default getNumTokens() downloads a ~3MB BPE
@@ -228,24 +229,35 @@ export default class ChatModelManager {
           customModel
         ),
       },
-      [ChatModelProviders.ANTHROPIC]: {
-        anthropicApiKey: await getDecryptedKey(customModel.apiKey || settings.anthropicApiKey),
-        model: modelName,
-        anthropicApiUrl: customModel.baseUrl,
-        clientOptions: {
-          // Required to bypass CORS restrictions
-          defaultHeaders: {
-            "anthropic-dangerous-direct-browser-access": "true",
+      [ChatModelProviders.ANTHROPIC]: await (async () => {
+        // [Cowork fork] When Claude subscription OAuth is enabled, route the
+        // request through a custom fetch that rewrites auth headers and injects
+        // the Claude Code system prompt. anthropicApiKey is set to a dummy
+        // non-empty value so ChatAnthropic's constructor doesn't throw.
+        const oauthActive = settings.claudeOAuthEnabled && !!settings.claudeOAuthToken;
+        const innerFetch = customModel.enableCors ? safeFetch : undefined;
+        const apiKey = oauthActive
+          ? "sk-ant-oauth-placeholder"
+          : await getDecryptedKey(customModel.apiKey || settings.anthropicApiKey);
+        return {
+          anthropicApiKey: apiKey,
+          model: modelName,
+          anthropicApiUrl: customModel.baseUrl,
+          clientOptions: {
+            // Required to bypass CORS restrictions
+            defaultHeaders: {
+              "anthropic-dangerous-direct-browser-access": "true",
+            },
+            fetch: oauthActive ? createClaudeOAuthFetch(innerFetch) : innerFetch,
           },
-          fetch: customModel.enableCors ? safeFetch : undefined,
-        },
-        ...(isThinkingEnabled && {
-          thinking: {
-            type: "enabled",
-            budget_tokens: ChatModelManager.ANTHROPIC_THINKING_BUDGET_TOKENS,
-          },
-        }),
-      },
+          ...(isThinkingEnabled && {
+            thinking: {
+              type: "enabled",
+              budget_tokens: ChatModelManager.ANTHROPIC_THINKING_BUDGET_TOKENS,
+            },
+          }),
+        };
+      })(),
       [ChatModelProviders.AZURE_OPENAI]: await (async () => {
         const azureUrl = normalizeAzureUrl(customModel.baseUrl);
         return {

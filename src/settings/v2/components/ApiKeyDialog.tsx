@@ -3,6 +3,7 @@ import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { PasswordInput } from "@/components/ui/password-input";
 import { ProviderSettingsKeyMap, SettingKeyProviders } from "@/constants";
 import { updateSetting, useSettingsValue } from "@/settings/model";
+import { ClaudeOAuthSection } from "@/settings/v2/components/ClaudeOAuthSection";
 import { GitHubCopilotAuth } from "@/settings/v2/components/GitHubCopilotAuth";
 import { LocalServicesSection } from "@/settings/v2/components/LocalServicesSection";
 import { ModelImporter } from "@/settings/v2/components/ModelImporter";
@@ -127,6 +128,9 @@ function ApiKeyModalContent({ onClose, onGoToModelTab }: ApiKeyModalContentProps
             );
           })}
         </div>
+
+        {/* Claude subscription OAuth (Cowork fork) */}
+        <ClaudeOAuthSection />
 
         {/* GitHub Copilot Section */}
         <GitHubCopilotAuth />
