@@ -112,7 +112,7 @@ export class DBOperations {
       return newDb;
     } catch (error) {
       logError(`Error initializing semantic index database:`, error);
-      new Notice("Failed to initialize Copilot database. Some features may be limited.");
+      new Notice("Failed to initialize Cowork database. Some features may be limited.");
       return undefined;
     }
   }
@@ -169,11 +169,11 @@ export class DBOperations {
       // Save the empty database
       await this.saveDB();
 
-      new Notice("Local Copilot index cleared successfully.");
+      new Notice("Local Cowork index cleared successfully.");
       logInfo("Local Copilot index cleared successfully, new instance created.");
     } catch (err) {
       logError("Error clearing the local Copilot index:", err);
-      new Notice("An error occurred while clearing the local Copilot index.");
+      new Notice("An error occurred while clearing the local Cowork index.");
       throw err;
     }
   }
@@ -506,7 +506,7 @@ export class DBOperations {
 
       if (!areEmbeddingModelsSame(prevEmbeddingModel, currEmbeddingModel)) {
         // Model has changed, notify user and rebuild DB
-        new Notice("New embedding model detected. Rebuilding Copilot index from scratch.");
+        new Notice("New embedding model detected. Rebuilding Cowork index from scratch.");
         logInfo(
           `Detected change in embedding model from "${prevEmbeddingModel}" to "${currEmbeddingModel}". Rebuilding Copilot index from scratch.`
         );
@@ -598,7 +598,7 @@ export class DBOperations {
       return docsToRemove.length;
     } catch (err) {
       logError("Error garbage collecting the Copilot index:", err);
-      throw new CustomError("Failed to garbage collect the Copilot index.");
+      throw new CustomError("Failed to garbage collect the Cowork index.");
     }
   }
 

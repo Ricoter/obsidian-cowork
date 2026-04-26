@@ -614,11 +614,21 @@ export function sanitizeSettings(settings: CopilotSettings): CopilotSettings {
   return sanitizedSettings;
 }
 
+// [Cowork fork] Filter Copilot Plus / Brevilabs-backed models out of the
+// active list on every load. Existing data.json files from upstream Copilot
+// installs may have these enabled; this strips them so the model dropdown
+// stays clean. The provider enums themselves still exist for code-path compat.
+function isPlusProvider(provider: string): boolean {
+  return provider === "copilot-plus" || provider === "copilot-plus-jina";
+}
+
 function mergeAllActiveModelsWithCoreModels(settings: CopilotSettings): CopilotSettings {
-  settings.activeModels = mergeActiveModels(settings.activeModels, BUILTIN_CHAT_MODELS);
+  settings.activeModels = mergeActiveModels(settings.activeModels, BUILTIN_CHAT_MODELS).filter(
+    (m) => !isPlusProvider(m.provider)
+  );
   settings.activeEmbeddingModels = filterUnsupportedEmbeddingModels(
     mergeActiveModels(settings.activeEmbeddingModels, BUILTIN_EMBEDDING_MODELS)
-  );
+  ).filter((m) => !isPlusProvider(m.provider));
   return settings;
 }
 

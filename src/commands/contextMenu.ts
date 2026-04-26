@@ -29,9 +29,9 @@ export function registerContextMenu(menu: Menu, obsidianApp: App): void {
     obsidianApp.commands.executeCommandById(commandId);
   };
 
-  // Create the main "Copilot" submenu
+  // Create the main "Cowork" submenu
   menu.addItem((item) => {
-    item.setTitle("Copilot");
+    item.setTitle("Cowork");
     item.setSubmenu();
 
     const submenu = item.submenu;

@@ -87,7 +87,7 @@ export function useQuickAskSession(params: UseQuickAskSessionParams): QuickAskSe
     excludeThinking: true,
     onNoModel: () => {
       logError("No active model is configured. Please configure a model in Copilot settings.");
-      new Notice("No active model configured. Please configure a model in Copilot settings.");
+      new Notice("No active model configured. Please configure a model in Cowork settings.");
     },
     onNonAbortError: (error) => {
       logError("Error generating response:", error);

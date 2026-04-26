@@ -189,7 +189,7 @@ export function registerCommands(
       return;
     }
     const clearMessage =
-      "This will permanently delete all document indexes in Copilot. This action cannot be undone.\n\nAre you sure you want to proceed?";
+      "This will permanently delete all document indexes in Cowork. This action cannot be undone.\n\nAre you sure you want to proceed?";
     const confirmed = await new Promise<boolean>((resolve) => {
       new ConfirmModal(
         plugin.app,
@@ -205,7 +205,7 @@ export function registerCommands(
     try {
       const VectorStoreManager = (await import("@/search/vectorStoreManager")).default;
       await VectorStoreManager.getInstance().clearIndex();
-      new Notice("Cleared local Copilot semantic index.");
+      new Notice("Cleared local Cowork semantic index.");
     } catch (err) {
       logError("Error clearing semantic index:", err);
       new Notice("Failed to clear semantic index.");
@@ -333,7 +333,7 @@ export function registerCommands(
 
       // Create content for the file
       const content = [
-        "# Copilot Files Status",
+        "# Cowork Files Status",
         `- Indexed files: ${indexedFiles.size}`,
         `- Unindexed files: ${unindexedFiles.size}`,
         `- Empty files: ${emptyFiles.size}`,
@@ -369,7 +369,7 @@ export function registerCommands(
       ].join("\n");
 
       // Create or update the file in the vault
-      const fileName = `Copilot-Indexed-Files-${new Date().toLocaleDateString().replace(/\//g, "-")}.md`;
+      const fileName = `Cowork-Indexed-Files-${new Date().toLocaleDateString().replace(/\//g, "-")}.md`;
       const folderPath = "copilot";
       const filePath = `${folderPath}/${fileName}`;
 
@@ -442,7 +442,7 @@ export function registerCommands(
       ].join("\n");
 
       // Create the debug file
-      const fileName = `Copilot-Embedding-Debug-${activeFile.basename.replace(/[\\/:*?"<>|]/g, "_")}.md`;
+      const fileName = `Cowork-Embedding-Debug-${activeFile.basename.replace(/[\\/:*?"<>|]/g, "_")}.md`;
       const folderPath = "copilot";
       const filePath = `${folderPath}/${fileName}`;
 
@@ -478,10 +478,10 @@ export function registerCommands(
       const fileCache = FileCache.getInstance<string>();
       await fileCache.clear();
 
-      new Notice("All Copilot caches cleared successfully");
+      new Notice("All Cowork caches cleared successfully");
     } catch (error) {
       logError("Error clearing Copilot caches:", error);
-      new Notice("Failed to clear Copilot caches");
+      new Notice("Failed to clear Cowork caches");
     }
   });
 
@@ -492,7 +492,7 @@ export function registerCommands(
       await logFileManager.openLogFile();
     } catch (error) {
       logError("Error creating Copilot log file:", error);
-      new Notice("Failed to create Copilot log file.");
+      new Notice("Failed to create Cowork log file.");
     }
   });
 
@@ -500,10 +500,10 @@ export function registerCommands(
   addCommand(plugin, COMMAND_IDS.CLEAR_LOG_FILE, async () => {
     try {
       await logFileManager.clear();
-      new Notice("Copilot log cleared.");
+      new Notice("Cowork log cleared.");
     } catch (error) {
       logError("Error clearing Copilot log file:", error);
-      new Notice("Failed to clear Copilot log file.");
+      new Notice("Failed to clear Cowork log file.");
     }
   });
 
@@ -624,7 +624,9 @@ export function registerCommands(
   addCommand(plugin, COMMAND_IDS.DOWNLOAD_YOUTUBE_SCRIPT, async () => {
     const isPlusUser = await checkIsPlusUser();
     if (!isPlusUser) {
-      new Notice("Download YouTube Script (plus) is a Copilot Plus feature");
+      new Notice(
+        "YouTube transcript download requires Brevilabs, which is disabled in the Cowork fork."
+      );
       return;
     }
 

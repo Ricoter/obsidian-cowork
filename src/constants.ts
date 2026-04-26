@@ -117,7 +117,7 @@ export const YOUTUBE_VIDEO_CONTEXT_TAG = "youtube_video_context";
 /** Marker text used as placeholder for active web tab in serialized content */
 export const ACTIVE_WEB_TAB_MARKER = "{activeWebTab}";
 export const EMPTY_INDEX_ERROR_MESSAGE =
-  "Copilot index does not exist. Please index your vault first!\n\n1. Set a working embedding model in QA settings. If it's not a local model, don't forget to set the API key. \n\n2. Click 'Refresh Index for Vault' and wait for indexing to complete. If you encounter the rate limiting error, please turn your request per second down in QA setting.";
+  "Cowork index does not exist. Please index your vault first!\n\n1. Set a working embedding model in QA settings. If it's not a local model, don't forget to set the API key. \n\n2. Click 'Refresh Index for Vault' and wait for indexing to complete. If you encounter the rate limiting error, please turn your request per second down in QA setting.";
 export const CHUNK_SIZE = 6000;
 export const TEXT_WEIGHT = 0.4;
 export const MAX_CHARS_FOR_LOCAL_SEARCH_CONTEXT = 448000;
@@ -820,23 +820,23 @@ export const COMMAND_IDS = {
 
 export const COMMAND_NAMES: Record<CommandId, string> = {
   [COMMAND_IDS.TRIGGER_QUICK_COMMAND]: "Trigger quick command",
-  [COMMAND_IDS.CLEAR_LOCAL_COPILOT_INDEX]: "Clear local Copilot index",
-  [COMMAND_IDS.CLEAR_COPILOT_CACHE]: "Clear Copilot cache",
+  [COMMAND_IDS.CLEAR_LOCAL_COPILOT_INDEX]: "Clear local Cowork index",
+  [COMMAND_IDS.CLEAR_COPILOT_CACHE]: "Clear Cowork cache",
   [COMMAND_IDS.COUNT_TOTAL_VAULT_TOKENS]: "Count total tokens in your vault",
   [COMMAND_IDS.COUNT_WORD_AND_TOKENS_SELECTION]: "Count words and tokens in selection",
   [COMMAND_IDS.DEBUG_WORD_COMPLETION]: "Word completion: Debug",
   [COMMAND_IDS.FORCE_REINDEX_VAULT_TO_COPILOT_INDEX]: "Force reindex vault",
   [COMMAND_IDS.GARBAGE_COLLECT_COPILOT_INDEX]:
-    "Garbage collect Copilot index (remove files that no longer exist in vault)",
+    "Garbage collect Cowork index (remove files that no longer exist in vault)",
   [COMMAND_IDS.INDEX_VAULT_TO_COPILOT_INDEX]: "Index (refresh) vault",
-  [COMMAND_IDS.INSPECT_COPILOT_INDEX_BY_NOTE_PATHS]: "Inspect Copilot index by note paths (debug)",
+  [COMMAND_IDS.INSPECT_COPILOT_INDEX_BY_NOTE_PATHS]: "Inspect Cowork index by note paths (debug)",
   [COMMAND_IDS.LIST_INDEXED_FILES]: "List all indexed files (debug)",
-  [COMMAND_IDS.LOAD_COPILOT_CHAT_CONVERSATION]: "Load Copilot chat conversation",
-  [COMMAND_IDS.NEW_CHAT]: "New Copilot Chat",
-  [COMMAND_IDS.OPEN_COPILOT_CHAT_WINDOW]: "Open Copilot Chat Window",
-  [COMMAND_IDS.REMOVE_FILES_FROM_COPILOT_INDEX]: "Remove files from Copilot index (debug)",
+  [COMMAND_IDS.LOAD_COPILOT_CHAT_CONVERSATION]: "Load Cowork chat conversation",
+  [COMMAND_IDS.NEW_CHAT]: "New Cowork Chat",
+  [COMMAND_IDS.OPEN_COPILOT_CHAT_WINDOW]: "Open Cowork Chat Window",
+  [COMMAND_IDS.REMOVE_FILES_FROM_COPILOT_INDEX]: "Remove files from Cowork index (debug)",
   [COMMAND_IDS.SEARCH_ORAMA_DB]: "Search semantic index (debug)",
-  [COMMAND_IDS.TOGGLE_COPILOT_CHAT_WINDOW]: "Toggle Copilot Chat Window",
+  [COMMAND_IDS.TOGGLE_COPILOT_CHAT_WINDOW]: "Toggle Cowork Chat Window",
   [COMMAND_IDS.ADD_SELECTION_TO_CHAT_CONTEXT]: "Add selection to chat context",
   [COMMAND_IDS.ADD_WEB_SELECTION_TO_CHAT_CONTEXT]: "Add web selection to chat context",
   [COMMAND_IDS.ADD_CUSTOM_COMMAND]: "Add new custom command",
@@ -892,9 +892,9 @@ export const ALLOWED_NOTE_CONTEXT_EXTENSIONS = [...TEXT_READABLE_EXTENSIONS, "pd
 
 export const RESTRICTION_MESSAGES = {
   NON_MARKDOWN_FILES_RESTRICTED:
-    "Non-markdown files are only available in Copilot Plus mode. Please upgrade to access this file type.",
+    "Non-markdown files require Plus-mode features (PDF/document parsing) which are disabled in the Cowork fork. Convert to markdown first.",
   URL_PROCESSING_RESTRICTED:
-    "URL processing is only available in Copilot Plus mode. URLs will not be processed for context.",
+    "URL processing requires Plus-mode features (web fetching via Brevilabs) which are disabled in the Cowork fork. URLs will not be processed for context.",
   UNSUPPORTED_FILE_TYPE: (extension: string) =>
     `${extension.toUpperCase()} files are not supported in the current mode.`,
 } as const;
@@ -963,8 +963,15 @@ export const DEFAULT_SETTINGS: CopilotSettings = {
   maxSourceChunks: DEFAULT_MAX_SOURCE_CHUNKS,
   enableInlineCitations: true,
   groqApiKey: "",
-  activeModels: BUILTIN_CHAT_MODELS,
-  activeEmbeddingModels: BUILTIN_EMBEDDING_MODELS,
+  // [Cowork fork] Filter out COPILOT_PLUS-provider models from defaults.
+  // Brevilabs is blocked by this fork so these models can never reach the
+  // backend. Removing them from defaults keeps the model picker clean.
+  activeModels: BUILTIN_CHAT_MODELS.filter((m) => m.provider !== ChatModelProviders.COPILOT_PLUS),
+  activeEmbeddingModels: BUILTIN_EMBEDDING_MODELS.filter(
+    (m) =>
+      m.provider !== EmbeddingModelProviders.COPILOT_PLUS &&
+      m.provider !== EmbeddingModelProviders.COPILOT_PLUS_JINA
+  ),
   embeddingRequestsPerMin: 60,
   embeddingBatchSize: 16,
   disableIndexOnMobile: true,

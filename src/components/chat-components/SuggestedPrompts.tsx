@@ -48,8 +48,11 @@ const SUGGESTED_PROMPTS: Record<string, NotePrompt> = {
       `Based on my notes on <topic>, what is the question that I should be asking, but am not?`,
     ],
   },
+  // [Cowork fork] Copilot Plus prompts kept as-is internally for any Plus-mode
+  // chat that already exists, but renamed for display so the title doesn't
+  // surface "Copilot Plus" branding.
   copilotPlus: {
-    title: "Copilot Plus",
+    title: "Advanced (Plus mode)",
     prompts: [
       `Give me a recap of last week @vault`,
       `What are the key takeaways from my notes on <topic> @vault`,
@@ -146,7 +149,7 @@ export const SuggestedPrompts: React.FC<SuggestedPromptsProps> = ({ onClick }) =
               <TriangleAlert className="tw-size-4" /> Your auto-index strategy is set to{" "}
               <b>NEVER</b>. Before proceeding, click the{" "}
               <span className="tw-text-accent">Refresh Index</span> button below or run the{" "}
-              <span className="tw-text-accent">Copilot command: Index (refresh) vault for QA</span>{" "}
+              <span className="tw-text-accent">Cowork command: Index (refresh) vault for QA</span>{" "}
               to update the index.
             </div>
           </div>

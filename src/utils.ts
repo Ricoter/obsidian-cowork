@@ -53,7 +53,7 @@ interface APIError extends Error {
 // Error message constants
 export const ERROR_MESSAGES = {
   INVALID_LICENSE_KEY_USER:
-    "Invalid Copilot Plus license key. Please check your license key in settings.",
+    "Invalid license key. (Note: Cowork fork blocks Brevilabs by default; Plus features are disabled.)",
   UNKNOWN_ERROR: "An unknown error occurred",
   REQUEST_FAILED: (status: number) => `Request failed, status ${status}`,
 } as const;

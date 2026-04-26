@@ -95,7 +95,7 @@ export class IndexOperations {
           indexedCount: 0,
           totalFiles: 0,
           errors: [
-            "Embedding model not available. Please check your Copilot settings to make sure you have a working embedding model.",
+            "Embedding model not available. Please check your Cowork settings to make sure you have a working embedding model.",
           ],
           completionStatus: "error",
         });
@@ -536,7 +536,7 @@ export class IndexOperations {
     // Handle json stringify string length error consistently
     if (this.isStringLengthError(error)) {
       new Notice(
-        "Vault is too large for 1 partition, please increase the number of partitions in your Copilot QA settings!",
+        "Vault is too large for 1 partition, please increase the number of partitions in your Cowork QA settings!",
         10000 // Show for 10 seconds
       );
       return;

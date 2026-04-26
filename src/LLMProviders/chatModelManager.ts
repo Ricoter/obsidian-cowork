@@ -341,7 +341,7 @@ export default class ChatModelManager {
           fetch: customModel.enableCors ? safeFetch : undefined,
           defaultHeaders: {
             "HTTP-Referer": "https://obsidiancopilot.com",
-            "X-Title": "Obsidian Copilot",
+            "X-Title": "Obsidian Cowork",
           },
         },
         // Enable reasoning if the model has the reasoning capability

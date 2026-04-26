@@ -4,12 +4,10 @@ import { HelpTooltip } from "@/components/ui/help-tooltip";
 import { Input } from "@/components/ui/input";
 import { getModelDisplayWithIcons } from "@/components/ui/model-display";
 import { SettingItem } from "@/components/ui/setting-item";
-import { DEFAULT_OPEN_AREA, PLUS_UTM_MEDIUMS, SEND_SHORTCUT } from "@/constants";
+import { DEFAULT_OPEN_AREA, SEND_SHORTCUT } from "@/constants";
 import { useTab } from "@/contexts/TabContext";
 import { cn } from "@/lib/utils";
-import { createPlusPageUrl } from "@/plusUtils";
 import { getModelKeyFromModel, updateSetting, useSettingsValue } from "@/settings/model";
-import { PlusSettings } from "@/settings/v2/components/PlusSettings";
 import { checkModelApiKey, formatDateTime } from "@/utils";
 import { isSortStrategy } from "@/utils/recentUsageManager";
 import { Key, Loader2 } from "lucide-react";
@@ -17,12 +15,22 @@ import { Notice } from "obsidian";
 import React, { useState } from "react";
 import { ApiKeyDialog } from "./ApiKeyDialog";
 
+// [Cowork fork] Copilot Plus mode hidden — relies on Brevilabs which this fork
+// blocks by default. The chain type still exists internally for backward
+// compatibility with existing chat history files.
 const ChainType2Label: Record<ChainType, string> = {
   [ChainType.LLM_CHAIN]: "Chat",
   [ChainType.VAULT_QA_CHAIN]: "Vault QA (Basic)",
-  [ChainType.COPILOT_PLUS_CHAIN]: "Copilot Plus",
+  [ChainType.COPILOT_PLUS_CHAIN]: "Copilot Plus (hidden — see COWORK.md)",
   [ChainType.PROJECT_CHAIN]: "Projects (alpha)",
 };
+
+// [Cowork fork] Modes shown in the dropdown. Excludes COPILOT_PLUS_CHAIN.
+const COWORK_VISIBLE_CHAIN_TYPES: ChainType[] = [
+  ChainType.LLM_CHAIN,
+  ChainType.VAULT_QA_CHAIN,
+  ChainType.PROJECT_CHAIN,
+];
 
 export const BasicSettings: React.FC = () => {
   const settings = useSettingsValue();
@@ -91,7 +99,8 @@ export const BasicSettings: React.FC = () => {
 
   return (
     <div className="tw-space-y-4">
-      <PlusSettings />
+      {/* [Cowork fork] PlusSettings (Copilot Plus license entry) removed.
+          Brevilabs is blocked by default; license input would be misleading. */}
 
       {/* General Section */}
       <section>
@@ -196,20 +205,7 @@ export const BasicSettings: React.FC = () => {
                           <strong>Vault QA (Basic):</strong> Ask questions about your vault content
                           with semantic search. <i>Free to use with your own API key.</i>
                         </li>
-                        <li>
-                          <strong>Copilot Plus:</strong> Covers all features of the 2 free modes,
-                          plus advanced paid features including chat context menu, advanced search,
-                          AI agents, and more. Check out{" "}
-                          <a
-                            href={createPlusPageUrl(PLUS_UTM_MEDIUMS.MODE_SELECT_TOOLTIP)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="tw-text-accent hover:tw-text-accent-hover"
-                          >
-                            obsidiancopilot.com
-                          </a>{" "}
-                          for more details.
-                        </li>
+                        {/* [Cowork fork] Copilot Plus mode description removed. */}
                       </ul>
                     </div>
                   }
@@ -218,8 +214,9 @@ export const BasicSettings: React.FC = () => {
             }
             value={settings.defaultChainType}
             onChange={(value) => updateSetting("defaultChainType", value as ChainType)}
-            options={Object.entries(ChainType2Label).map(([key, value]) => ({
-              label: value,
+            // [Cowork fork] Filter to visible (non-Plus) chain types only.
+            options={COWORK_VISIBLE_CHAIN_TYPES.map((key) => ({
+              label: ChainType2Label[key],
               value: key,
             }))}
           />
