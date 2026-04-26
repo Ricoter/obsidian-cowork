@@ -132,7 +132,11 @@ export default class ChatModelManager {
     [ChatModelProviders.OPENAI]: () => getSettings().openAIApiKey,
     [ChatModelProviders.GOOGLE]: () => getSettings().googleApiKey,
     [ChatModelProviders.AZURE_OPENAI]: () => getSettings().azureOpenAIApiKey,
-    [ChatModelProviders.ANTHROPIC]: () => getSettings().anthropicApiKey,
+    [ChatModelProviders.ANTHROPIC]: () => {
+      // [Cowork fork] OAuth token counts as valid Anthropic credential.
+      const s = getSettings();
+      return s.claudeOAuthEnabled && s.claudeOAuthToken ? s.claudeOAuthToken : s.anthropicApiKey;
+    },
     [ChatModelProviders.COHEREAI]: () => getSettings().cohereApiKey,
     [ChatModelProviders.OPENROUTERAI]: () => getSettings().openRouterAiApiKey,
     [ChatModelProviders.GROQ]: () => getSettings().groqApiKey,

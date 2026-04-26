@@ -1,7 +1,7 @@
 {
   "id": "cowork",
   "name": "Cowork",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "minAppVersion": "0.15.0",
   "description": "Privacy-focused fork of Copilot for Obsidian with Claude subscription OAuth support and hardened mobile encryption.",
   "author": "Ricoter (fork of Logan Yang's Copilot)",

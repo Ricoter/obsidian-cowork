@@ -1266,6 +1266,20 @@ export function checkModelApiKey(
     return { hasApiKey: true };
   }
 
+  // [Cowork fork] Anthropic with Claude subscription OAuth — token replaces API key
+  if (model.provider === ChatModelProviders.ANTHROPIC) {
+    const oauthActive = settings.claudeOAuthEnabled && !!settings.claudeOAuthToken;
+    const hasAuth = Boolean(model.apiKey || settings.anthropicApiKey || oauthActive);
+    if (!hasAuth) {
+      return {
+        hasApiKey: false,
+        errorNotice:
+          "Anthropic credentials missing. Either set an API key or enable Claude subscription OAuth in Settings > API Keys.",
+      };
+    }
+    return { hasApiKey: true };
+  }
+
   const needSetKeyPath = !!getNeedSetKeyProvider().find((provider) => provider === model.provider);
   const hasNoApiKey = !getApiKeyForProvider(model.provider as SettingKeyProviders, model);
 
