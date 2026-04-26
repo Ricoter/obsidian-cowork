@@ -1157,21 +1157,21 @@ export function isNewerVersion(latest: string, current: string): boolean {
  * Check for latest version from GitHub releases.
  * @returns latest version string or error message
  */
+/**
+ * [Cowork fork] No-op. Upstream Copilot's checker queried
+ * `api.github.com/repos/logancyang/obsidian-copilot/releases/latest` to drive
+ * the in-app "update available" banner, which would surface upstream releases
+ * to fork users (irrelevant) and constitutes a phone-home this fork rejects.
+ *
+ * Updates for the fork happen via BRAT, which polls our own releases endpoint
+ * separately and is the source of truth for fork users. Returning null here
+ * suppresses the in-app banner without touching network.
+ */
 export async function checkLatestVersion(): Promise<{
   version: string | null;
   error: string | null;
 }> {
-  try {
-    const response = await requestUrl({
-      url: "https://api.github.com/repos/logancyang/obsidian-copilot/releases/latest",
-      method: "GET",
-    });
-    const version = response.json.tag_name.replace("v", "");
-    return { version, error: null };
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Failed to check for updates";
-    return { version: null, error: errorMessage };
-  }
+  return { version: null, error: null };
 }
 
 // Note: LangChain 0.6.6+ handles O-series and GPT-5 models automatically

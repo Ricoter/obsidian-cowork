@@ -4,8 +4,13 @@ import { v4 as uuidv4 } from "uuid";
 import { ChainType } from "./chainFactory";
 import { PromptSortStrategy } from "./types";
 
-export const BREVILABS_API_BASE_URL = "https://api.brevilabs.com/v1";
-export const BREVILABS_MODELS_BASE_URL = "https://models.brevilabs.com/v1";
+// [Cowork fork] Neutralized to empty strings. The hosts are also blocked in
+// safeFetch (utils.ts) and BrevilabsClient is short-circuited by
+// disableBrevilabs. Three independent layers prevent any traffic to
+// brevilabs.com from this fork. The constants stay defined to avoid
+// import-not-found errors in untouched upstream code paths.
+export const BREVILABS_API_BASE_URL = "";
+export const BREVILABS_MODELS_BASE_URL = "";
 export const CHAT_VIEWTYPE = "copilot-chat-view";
 export const USER_SENDER = "user";
 export const AI_SENDER = "ai";

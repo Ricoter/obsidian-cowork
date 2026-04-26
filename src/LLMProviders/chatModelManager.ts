@@ -340,7 +340,10 @@ export default class ChatModelManager {
           baseURL: customModel.baseUrl || "https://openrouter.ai/api/v1",
           fetch: customModel.enableCors ? safeFetch : undefined,
           defaultHeaders: {
-            "HTTP-Referer": "https://obsidiancopilot.com",
+            // [Cowork fork] Identify the fork to providers like OpenRouter that
+            // surface app attribution in their dashboards. Replaces upstream's
+            // "https://obsidiancopilot.com" referer.
+            "HTTP-Referer": "https://github.com/Ricoter/obsidian-cowork",
             "X-Title": "Obsidian Cowork",
           },
         },

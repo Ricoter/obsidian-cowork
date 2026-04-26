@@ -372,12 +372,22 @@ export function applyPlusSettings(): void {
   }
 }
 
-export function createPlusPageUrl(medium: PlusUtmMedium): string {
-  return `https://www.obsidiancopilot.com?utm_source=obsidian&utm_medium=${medium}`;
+/**
+ * [Cowork fork] Neutralized. Upstream returned a `obsidiancopilot.com` URL with
+ * UTM tracking for "upgrade to Plus" CTAs. Plus is hidden in this fork; this
+ * function is unreachable from UI but stays as a no-op return for any
+ * defensive code that might still call it. Returns empty string so any
+ * accidental `<a href>` becomes a non-link.
+ */
+export function createPlusPageUrl(_medium: PlusUtmMedium): string {
+  return "";
 }
 
-export function navigateToPlusPage(medium: PlusUtmMedium): void {
-  window.open(createPlusPageUrl(medium), "_blank");
+/**
+ * [Cowork fork] Neutralized. Upstream opened obsidiancopilot.com in a new tab.
+ */
+export function navigateToPlusPage(_medium: PlusUtmMedium): void {
+  // no-op: Plus features are not available in the Cowork fork
 }
 
 export function turnOnPlus(): void {

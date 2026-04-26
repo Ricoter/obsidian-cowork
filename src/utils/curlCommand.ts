@@ -250,10 +250,12 @@ async function buildOpenAICompatibleRequestSpec(
     headers["OpenAI-Organization"] = model.openAIOrgId.trim();
   }
 
-  // Add OpenRouter-specific headers (see chatModelManager.ts:259-262)
+  // Add OpenRouter-specific headers (see chatModelManager.ts)
+  // [Cowork fork] Identify the fork instead of upstream Copilot for OpenRouter
+  // app-attribution dashboards.
   if (provider === ChatModelProviders.OPENROUTERAI) {
-    headers["HTTP-Referer"] = "https://obsidiancopilot.com";
-    headers["X-Title"] = "Obsidian Copilot";
+    headers["HTTP-Referer"] = "https://github.com/Ricoter/obsidian-cowork";
+    headers["X-Title"] = "Obsidian Cowork";
   }
 
   if (isEmbeddingModel) {
@@ -628,7 +630,7 @@ async function buildBedrockCurlText(model: CustomModel): Promise<BuildCurlComman
 
   const commandText = [
     "# Amazon Bedrock InvokeModel",
-    "# Option A: Bearer token auth (matches Obsidian Copilot)",
+    "# Option A: Bearer token auth (matches Obsidian Cowork)",
     formatCurlCommand(bearerSpec),
     "",
     "# Option B: IAM auth (AWS SigV4)",
