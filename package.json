@@ -1,6 +1,6 @@
 {
   "name": "obsidian-cowork",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Privacy-focused fork of Copilot for Obsidian with Claude subscription OAuth support and hardened mobile encryption.",
   "main": "main.js",
   "scripts": {

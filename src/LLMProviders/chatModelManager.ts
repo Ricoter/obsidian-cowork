@@ -234,12 +234,20 @@ export default class ChatModelManager {
         ),
       },
       [ChatModelProviders.ANTHROPIC]: await (async () => {
-        // [Cowork fork] When Claude subscription OAuth is enabled, route the
-        // request through a custom fetch that rewrites auth headers and injects
-        // the Claude Code system prompt. anthropicApiKey is set to a dummy
-        // non-empty value so ChatAnthropic's constructor doesn't throw.
+        // [Cowork fork] When Claude subscription OAuth is enabled:
+        // - Route through safeFetch unconditionally. Consumer Pro/Max accounts
+        //   reject browser-style CORS requests even with the
+        //   "anthropic-dangerous-direct-browser-access" opt-in header — that
+        //   header is an enterprise/org setting, not available to consumers.
+        //   safeFetch uses Obsidian's `requestUrl` which routes via Electron's
+        //   net module / mobile native fetch, so the request looks server-side.
+        // - Drop the dangerous-direct-browser-access header to avoid Anthropic
+        //   classifying us as a browser request at all.
+        // - Set anthropicApiKey to a dummy non-empty value so ChatAnthropic's
+        //   constructor doesn't throw; the real auth happens in the fetch
+        //   wrapper.
         const oauthActive = settings.claudeOAuthEnabled && !!settings.claudeOAuthToken;
-        const innerFetch = customModel.enableCors ? safeFetch : undefined;
+        const apiKeyInnerFetch = customModel.enableCors ? safeFetch : undefined;
         const apiKey = oauthActive
           ? "sk-ant-oauth-placeholder"
           : await getDecryptedKey(customModel.apiKey || settings.anthropicApiKey);
@@ -248,11 +256,10 @@ export default class ChatModelManager {
           model: modelName,
           anthropicApiUrl: customModel.baseUrl,
           clientOptions: {
-            // Required to bypass CORS restrictions
-            defaultHeaders: {
-              "anthropic-dangerous-direct-browser-access": "true",
-            },
-            fetch: oauthActive ? createClaudeOAuthFetch(innerFetch) : innerFetch,
+            defaultHeaders: oauthActive
+              ? {} // browser-access header would trigger consumer CORS block
+              : { "anthropic-dangerous-direct-browser-access": "true" },
+            fetch: oauthActive ? createClaudeOAuthFetch(safeFetch) : apiKeyInnerFetch,
           },
           ...(isThinkingEnabled && {
             thinking: {

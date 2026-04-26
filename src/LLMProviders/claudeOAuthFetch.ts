@@ -80,6 +80,9 @@ export function createClaudeOAuthFetch(
 
     const headers = new Headers(init?.headers);
     headers.delete("x-api-key");
+    // The browser-access opt-in is an enterprise feature; including it on
+    // consumer OAuth requests triggers a CORS-policy 401. Strip it.
+    headers.delete("anthropic-dangerous-direct-browser-access");
     headers.set("Authorization", `Bearer ${token}`);
     for (const [k, v] of Object.entries(OAUTH_HEADERS)) {
       headers.set(k, v);
