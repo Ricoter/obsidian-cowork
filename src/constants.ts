@@ -160,10 +160,15 @@ export enum Verbosity {
   HIGH = "high",
 }
 
+// [Cowork fork] Opted for chat-friendly defaults rather than upstream's
+// deterministic-translation defaults (temp 0.1, max 6000):
+// - 0.7 temperature: balanced creativity for free-form chat with notes
+// - 8192 max_tokens: long enough for detailed responses without runaway cost
+// - Reasoning models override temperature anyway (forced to 1)
 export const DEFAULT_MODEL_SETTING = {
-  MAX_TOKENS: 6000,
-  TEMPERATURE: 0.1,
-  REASONING_EFFORT: ReasoningEffort.LOW,
+  MAX_TOKENS: 8192,
+  TEMPERATURE: 0.7,
+  REASONING_EFFORT: ReasoningEffort.MEDIUM,
   VERBOSITY: Verbosity.MEDIUM,
 } as const;
 
@@ -185,6 +190,7 @@ export enum ChatModels {
   GEMINI_3_FLASH_LITE_PREVIEW = "gemini-3.1-flash-lite-preview",
   GEMINI_PRO = "gemini-2.5-pro",
   GEMINI_FLASH = "gemini-2.5-flash",
+  CLAUDE_OPUS_4_7 = "claude-opus-4-7",
   CLAUDE_OPUS_4_6 = "claude-opus-4-6",
   CLAUDE_SONNET_4_6 = "claude-sonnet-4-6",
   GROK_4_1_FAST = "grok-4-1-fast",
@@ -273,6 +279,16 @@ export const BUILTIN_CHAT_MODELS: CustomModel[] = [
     isBuiltIn: true,
     core: true,
     capabilities: [ModelCapability.VISION],
+  },
+  {
+    // [Cowork fork] Opus 4.7 is the latest Anthropic model with reasoning;
+    // default-enabled so OAuth users see it immediately in the dropdown.
+    name: ChatModels.CLAUDE_OPUS_4_7,
+    provider: ChatModelProviders.ANTHROPIC,
+    enabled: true,
+    isBuiltIn: true,
+    core: true,
+    capabilities: [ModelCapability.VISION, ModelCapability.REASONING],
   },
   {
     name: ChatModels.CLAUDE_SONNET_4_6,
@@ -915,7 +931,10 @@ export const DEFAULT_SETTINGS: CopilotSettings = {
   // [Cowork fork] Brevilabs disabled by default (no phone-home, no Plus features)
   disableBrevilabs: true,
   defaultChainType: ChainType.LLM_CHAIN,
-  defaultModelKey: ChatModels.OPENROUTER_GEMINI_2_5_FLASH + "|" + ChatModelProviders.OPENROUTERAI,
+  // [Cowork fork] Default to Claude Opus 4.7 since this fork's primary auth
+  // path is Claude subscription OAuth. Users without an Anthropic credential
+  // can change this in Settings → Models → Default Model.
+  defaultModelKey: ChatModels.CLAUDE_OPUS_4_7 + "|" + ChatModelProviders.ANTHROPIC,
   embeddingModelKey:
     EmbeddingModels.OPENROUTER_OPENAI_EMBEDDING_SMALL + "|" + EmbeddingModelProviders.OPENROUTERAI,
   temperature: DEFAULT_MODEL_SETTING.TEMPERATURE,

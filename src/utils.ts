@@ -804,10 +804,26 @@ export function extractAllYoutubeUrls(text: string): string[] {
  *
  * @see https://forum.obsidian.md/t/support-streaming-the-request-and-requesturl-response-body/87381
  */
+// [Cowork fork] Domains that this fork refuses to contact, regardless of
+// settings. Belt-and-suspenders on top of BrevilabsClient's flag short-circuit:
+// even if a code path bypasses that guard or a future upstream change re-enables
+// the client, requests to these hosts fail at the fetch layer.
+const COWORK_BLOCKED_HOSTS = ["api.brevilabs.com", "models.brevilabs.com"] as const;
+
 export async function safeFetch(
   url: string,
   options: RequestInit & { throwOnHttpError?: boolean } = {}
 ): Promise<Response> {
+  // Hard block: refuse to contact any host on the Cowork blocklist.
+  for (const host of COWORK_BLOCKED_HOSTS) {
+    if (url.includes(host)) {
+      throw new Error(
+        `[Cowork] Refused to contact ${host}: blocked by fork policy. ` +
+          `Re-enable Brevilabs in settings to use Plus features.`
+      );
+    }
+  }
+
   const { throwOnHttpError = true } = options;
   // Initialize headers if not provided
   const normalizedHeaders = new Headers(options.headers);
